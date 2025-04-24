@@ -17,7 +17,7 @@ bool isSpace(char *buff)
 {
     return (*buff == ' ');
 }
-void trim_whitespaces(char *str)
+static void trim_whitespaces(char *str)
 {
   int start= 0, end = strlen(str) - 1; 
   while(str[start] == ' ' ||  str[start] == '\n' || str[start] == '\t')
@@ -286,7 +286,7 @@ bool XMLDocument_load(XMLDocument *doc, const char *path)
                 continue;
            }
            // Special nodes
-           //1.COMMENTS
+           //1. PARSE COMMENTS
            if(buff[buff_cursor+1] == '!' && buff[buff_cursor] =='<')
            {
                 while( buff[buff_cursor] && (buff[buff_cursor-1] != '-' || buff[buff_cursor] != '>' ) )
@@ -296,6 +296,7 @@ bool XMLDocument_load(XMLDocument *doc, const char *path)
                 lex[lex_cursor] = '\0';
                 trim_whitespaces( lex);
 
+                // Validates if the comment is valid - no syntax error 
                 if(!(starts_with(lex, "<!--") && ends_with(lex, "-->")) )
                 {
                     fprintf(stderr,"Illegal formated comment. (%s)", lex);
