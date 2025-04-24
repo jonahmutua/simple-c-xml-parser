@@ -17,7 +17,7 @@ bool isSpace(char *buff)
 {
     return (*buff == ' ');
 }
-static void trim_whitespaces(char *str)
+void trim_whitespaces(char *str)
 {
   int start= 0, end = strlen(str) - 1; 
   while(str[start] == ' ' ||  str[start] == '\n' || str[start] == '\t')
