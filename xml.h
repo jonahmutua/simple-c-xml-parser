@@ -7,6 +7,16 @@
 // Declaration  PARSER-XML
 //
 
+/**
+ * @brief XML prologu structure
+ */
+struct _XMLProlog
+{
+    char *version;
+    char *encoding;
+    char *standalone;
+};
+typedef struct  _XMLProlog XMLProlog;
 // xml attributes structure 
 /**
  *  @brief a structure to XML attributes
@@ -62,6 +72,10 @@ typedef struct _XMLnode XMLnode;
 struct _XMLDocument
 {
     XMLnode *root;
+    XMLProlog prolog;
+    char *version;
+    char *encoding;
+    char *standalone;
 };
 typedef struct _XMLDocument XMLDocument;
 

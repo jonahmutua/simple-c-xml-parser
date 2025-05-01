@@ -23,8 +23,16 @@ int main()
 
             for(int i = 0; i < main->children.size; i++)
             {
-                printf("Node %d: %s=\"%s\"\n", i+1, main->children.data[i]->tag, main->children.data[i]->inner_text);
+                printf("Node %d: %s=\"%s\"\n", i+1 , main->children.data[i]->tag, main->children.data[i]->inner_text);
             }
+
+            // Prints Prolog 
+            if( doc.prolog.version )
+                printf("Version: \"%s\"\n", doc.prolog.version);
+            if( doc.prolog.encoding )
+                printf("Encoding: \"%s\"\n", doc.prolog.encoding);
+            if( doc.prolog.standalone )
+                printf("Standalone: \"%s\"\n", doc.prolog.standalone);
 
         }else
             printf("Root has no children.\n");

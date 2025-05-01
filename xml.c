@@ -13,6 +13,82 @@ XMLnode* XMLNode_at( XMLnode *root, int index )
     node = root->children.data[index];
     return node;
 }
+
+static bool parse_prolog(char *buff, char *lex, int *buff_cursor, int *lex_cursor, XMLDocument *doc )
+{
+    while(buff[*buff_cursor] != ' ')
+        (*buff_cursor)++;
+
+    while( buff[*buff_cursor] &&  buff[*buff_cursor] != '>')
+    {
+        
+        lex[(*lex_cursor)++] = buff[(*buff_cursor)++];
+        if( buff[*buff_cursor] == '=')
+        {
+           
+            lex[*lex_cursor] = '\0';
+            trim_whitespaces(lex);
+            if(strcmp(lex,"version") == 0)
+            {
+                while( buff[*buff_cursor] && buff[(*buff_cursor)++] != '"');
+            
+                *lex_cursor = 0;
+                while ( buff[*buff_cursor] && buff[*buff_cursor] != '"')
+                    lex[(*lex_cursor)++] = buff[(*buff_cursor)++];
+                
+                lex[*lex_cursor] = '\0';
+                doc->prolog.version = strdup( lex);
+            
+                (*buff_cursor)++; //consume '""
+                *lex_cursor = 0;
+                continue;
+            }else if(strcmp(lex,"encoding") == 0)
+            {
+                
+                while( buff[*buff_cursor] && buff[(*buff_cursor)++] != '"');
+            
+                *lex_cursor = 0;
+                
+                while ( buff[*buff_cursor] && buff[*buff_cursor] != '"')
+                    lex[(*lex_cursor)++] = buff[(*buff_cursor)++];
+                
+                lex[*lex_cursor] = '\0';
+                doc->prolog.encoding = strdup( lex);
+            
+                (*buff_cursor)++; //consume '""
+                *lex_cursor = 0;
+                continue;
+            }else if(strcmp(lex,"standalone") == 0)
+            {
+                while(buff[(*buff_cursor)++] != '"');
+            
+                *lex_cursor = 0;
+                
+                while (buff[*buff_cursor] != '"')
+                    lex[(*lex_cursor)++] = buff[(*buff_cursor)++];
+                
+                lex[*lex_cursor] = '\0';
+                doc->prolog.standalone = strdup( lex);
+            
+                (*buff_cursor)++; //consume '""
+                *lex_cursor = 0;
+                
+                continue;
+            }else{
+                // Unsuported prolog key!
+
+            }
+
+        }
+    }
+
+    
+    
+    *lex_cursor = 0;
+    (*buff_cursor)++;  // Consume '>'
+   
+    return true;
+}
 bool isSpace(char *buff)
 {
     return (*buff == ' ');
@@ -233,6 +309,7 @@ void XMLDocument_free(XMLDocument *doc)
 }
 bool XMLDocument_load(XMLDocument *doc, const char *path)
 {
+
     FILE *file = fopen(path, "r");
     if(!file)
     {
@@ -306,7 +383,12 @@ bool XMLDocument_load(XMLDocument *doc, const char *path)
                 lex_cursor=0;
                 continue;
            }
-
+           //2. PARSE PROLOG
+           if(buff[buff_cursor+1] == '?')
+           {
+                parse_prolog(buff, lex, &buff_cursor, &lex_cursor, doc);
+                continue;
+           }
            // Node End
            if( buff[buff_cursor+1] == '/' && buff[buff_cursor] == '<')
            {

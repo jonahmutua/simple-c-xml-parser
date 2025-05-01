@@ -1,6 +1,6 @@
 #ignore .vscode 
 ./vscode
-.vscode
+.vscode/
 
 #ignore makefiles 
 MakeFile
